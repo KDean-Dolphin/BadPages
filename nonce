@@ -1,0 +1,8 @@
+# This file is used to force changes that require committing to GitHub.
+#
+# To update it, run the following command:
+#   sed -i "" -e "s/^[[:digit:]]\{1,\}$/$RANDOM/g" nonce
+#
+# Note: In some environments (e.g., GitHub bash), the double-quote after "-i"
+# must be removed.
+12345
