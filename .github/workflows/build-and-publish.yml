@@ -33,16 +33,16 @@ jobs:
           then
             # Build will be skipped if it has a tag that matches the version format.
             if [ `git tag --points-at HEAD "v*" | wc -l` != 0 ]
-              run-build=false
+              run_build=false
             then
-              run-build=true
+              run_build=true
             fi
           else
             # Build is always run on release.
-            run-build=true
+            run_build=true
           fi
           
-          echo run-build=$run-build >> "$GITHUB_OUTPUT"
+          echo run-build=$run_build >> "$GITHUB_OUTPUT"
           cat "$GITHUB_OUTPUT"
 
   build:
