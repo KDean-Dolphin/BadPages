@@ -34,7 +34,7 @@ jobs:
   build:
     needs: count-tags
 
-    if: needs.count-tags.outputs.tag-count == 0
+    if: needs.count-tags.outputs.tag-count == '0'
 
     environment:
       name: github-pages
