@@ -14,6 +14,8 @@ permissions:
 
 jobs:
   count-tags:
+    if: github.event_name == 'push'
+
     runs-on: ubuntu-latest
 
     outputs:
@@ -28,16 +30,7 @@ jobs:
       - name: Count tags
         id: count-tags
         run: |
-          echo With filter
-          git tag --points-at HEAD "v*"
-          echo Without filter
-          git tag --points-at HEAD
-          echo Command line
-          echo git tag --points-at HEAD "v*"
-          echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs`
           echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs` >> "$GITHUB_OUTPUT"
-          echo $GITHUB_OUTPUT
-          cat "$GITHUB_OUTPUT"
 
       - name: Start terminal session
         uses: mxschmitt/action-tmate@v3
@@ -45,7 +38,7 @@ jobs:
   build:
     needs: count-tags
 
-    if: needs.count-tags.outputs.tag-count == '0'
+    if: github.event_name != 'push' || needs.count-tags.outputs.tag-count == '0'
 
     environment:
       name: github-pages
