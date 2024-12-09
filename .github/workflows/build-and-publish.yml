@@ -40,10 +40,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout default repository
+        uses: actions/checkout@v4
+
       - name: Patch index.html
         run: |
-          mkdir pages
-          mv index.html pages/
           sed -i -e "s/EVENT/${{ github.event_name }}/g" pages/index.html
           sed -i -e "s/REF/${{ github.ref_name }}/g" pages/index.html
           sed -i -e "s/COMMIT/${{ github.sha }}/g" pages/index.html
