@@ -13,32 +13,42 @@ permissions:
   pages: write
 
 jobs:
-  count-tags:
-    if: github.event_name == 'push'
-
+  check-event:
     runs-on: ubuntu-latest
 
     outputs:
-      tag-count: ${{ steps.count-tags.outputs.tag-count }}
+      run-build: ${{ steps.check-event.outputs.run-build }}
 
     steps:
       - name: Checkout default repository
+        if: github.event_name == 'push'
         uses: actions/checkout@v4
         with:
           fetch-tags: 'true'
 
-      - name: Count tags
-        id: count-tags
+      - name: Check event
+        id: check-event
         run: |
-          echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs` >> "$GITHUB_OUTPUT"
-
-      - name: Start terminal session
-        uses: mxschmitt/action-tmate@v3
+          if [ "${{ github.event_name }}" == "push" ]
+          then
+            # Build will be skipped if it has a tag that matches the version format.
+            if [ `git tag --points-at HEAD "v*" | wc -l` != 0 ]
+              run-build=false
+            then
+              run-build=true
+            fi
+          else
+            # Build is always run on release.
+            run-build=true
+          fi
+          
+          echo run-build=$run-build >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
 
   build:
-    needs: count-tags
+    needs: check-event
 
-    if: github.event_name != 'push' || needs.count-tags.outputs.tag-count == '0'
+    if: needs.check-event.outputs.run-build == 'true'
 
     environment:
       name: github-pages
@@ -52,7 +62,6 @@ jobs:
 
       - name: Patch index.html
         run: |
-          echo Tag count ${{ needs.count-tags.outputs.tag-count }}
           sed -i -e "s/EVENT/${{ github.event_name }}/g" pages/index.html
           sed -i -e "s/REF/${{ github.ref_name }}/g" pages/index.html
           sed -i -e "s/COMMIT/${{ github.sha }}/g" pages/index.html
