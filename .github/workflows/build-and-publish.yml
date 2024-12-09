@@ -26,7 +26,10 @@ jobs:
       - name: Count tags
         id: count-tags
         run: |
+          echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs`
           echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs` >> "$GITHUB_OUTPUT"
+          echo $GITHUB_OUTPUT
+          cat "$GITHUB_OUTPUT"
 
   build:
     needs: count-tags
@@ -45,6 +48,7 @@ jobs:
 
       - name: Patch index.html
         run: |
+          echo Tag count ${{ needs.count-tags.outputs.tag-count }}
           sed -i -e "s/EVENT/${{ github.event_name }}/g" pages/index.html
           sed -i -e "s/REF/${{ github.ref_name }}/g" pages/index.html
           sed -i -e "s/COMMIT/${{ github.sha }}/g" pages/index.html
