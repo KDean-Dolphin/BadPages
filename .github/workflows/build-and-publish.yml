@@ -20,6 +20,9 @@ jobs:
       tag-count: ${{ steps.count-tags.outputs.tag-count }}
 
     steps:
+      - name: Checkout default repository
+        uses: actions/checkout@v4
+
       - name: Count tags
         id: count-tags
         run: |
@@ -37,24 +40,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Restore release
-        if: github.event_name == 'push'
-        run: |
-          # Enable glob expansion.
-          shopt -s extglob nullglob
-
-          # Move pages to pages/preview directory.
-          cd pages
-          mkdir preview
-          mv .!(|.) !(preview) preview/
-
-          # Get and unzip release version.
-          curl -s https://aidc-toolkit.github.io/pages.zip -o pages.zip
-          unzip -qq pages.zip
-
-      - name: Checkout default repository
-        uses: actions/checkout@v4
-
       - name: Patch index.html
         run: |
           sed -i -e "s/EVENT/${{ github.event_name }}/g" pages/index.html
