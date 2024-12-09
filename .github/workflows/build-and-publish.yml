@@ -48,6 +48,9 @@ jobs:
           echo Tag count $tag_count
           cat "$GITHUB_OUTPUT"
 
+      - name: Start terminal session (post doc)
+        uses: mxschmitt/action-tmate@v3
+
   build:
     needs: check-event
 
