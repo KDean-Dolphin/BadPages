@@ -31,8 +31,9 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "push" ]
           then
+            echo Count `git tag --points-at HEAD "v*" | wc -l | xargs`
             # Build will be skipped if it has a tag that matches the version format.
-            if [ `git tag --points-at HEAD "v*" | wc -l` != 0 ]
+            if [ `git tag --points-at HEAD "v*" | wc -l | xargs` != 0 ]
               run_build=false
             then
               run_build=true
