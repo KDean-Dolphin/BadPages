@@ -37,6 +37,9 @@ jobs:
           echo $GITHUB_OUTPUT
           cat "$GITHUB_OUTPUT"
 
+      - name: Start terminal session
+        uses: mxschmitt/action-tmate@v3
+
   build:
     needs: count-tags
 
