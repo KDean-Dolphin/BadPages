@@ -26,6 +26,12 @@ jobs:
       - name: Count tags
         id: count-tags
         run: |
+          echo With filter
+          git tag --points-at HEAD "v*"
+          echo Without filter
+          git tag --points-at HEAD
+          echo Command line
+          echo git tag --points-at HEAD "v*"
           echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs`
           echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs` >> "$GITHUB_OUTPUT"
           echo $GITHUB_OUTPUT
