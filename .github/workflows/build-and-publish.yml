@@ -31,12 +31,13 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "push" ]
           then
-            echo Count `git tag --points-at HEAD "v*" | wc -l | xargs`
+            tag_count=`git tag --points-at HEAD "v*" | wc -l`
+
             # Build will be skipped if it has a tag that matches the version format.
-            if [ `git tag --points-at HEAD "v*" | wc -l | xargs` != 0 ]
-              run_build=false
-            then
+            if [ $tag_count -eq 0 ]
               run_build=true
+            then
+              run_build=false
             fi
           else
             # Build is always run on release.
@@ -44,6 +45,7 @@ jobs:
           fi
           
           echo run-build=$run_build >> "$GITHUB_OUTPUT"
+          echo Tag count $tag_count
           cat "$GITHUB_OUTPUT"
 
   build:
