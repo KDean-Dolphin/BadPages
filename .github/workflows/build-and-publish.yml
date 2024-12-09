@@ -31,12 +31,11 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "push" ]
           then
-            tag_count=`git tag --points-at HEAD "v*" | wc -l`
-
             # Build will be skipped if it has a tag that matches the version format.
-            if [ $tag_count -eq 0 ]
-              run_build=true
+            if [ `git tag --points-at HEAD "v*" | wc -l` -eq 0 ]
             then
+              run_build=true
+            else
               run_build=false
             fi
           else
@@ -45,11 +44,7 @@ jobs:
           fi
           
           echo run-build=$run_build >> "$GITHUB_OUTPUT"
-          echo Tag count $tag_count
           cat "$GITHUB_OUTPUT"
-
-      - name: Start terminal session (post doc)
-        uses: mxschmitt/action-tmate@v3
 
   build:
     needs: check-event
