@@ -7,15 +7,29 @@ on:
   push:
     branches:
       - main
-    tags-ignore:
-      - v*
 
 permissions:
   id-token: write
   pages: write
 
 jobs:
+  count-tags:
+    runs-on: ubuntu-latest
+
+    outputs:
+      tag-count: ${{ steps.count-tags.outputs.tag-count }}
+
+    steps:
+      - name: Count tags
+        id: count-tags
+        run: |
+          echo tag-count=`git tag --points-at HEAD "v*" | wc -l | xargs` >> "$GITHUB_OUTPUT"
+
   build:
+    needs: count-tags
+
+    if: needs.count-tags.outputs.tag-count == 0
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -23,6 +37,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Restore release
+        if: github.event_name == 'push'
+        run: |
+          # Enable glob expansion.
+          shopt -s extglob nullglob
+
+          # Move pages to pages/preview directory.
+          cd pages
+          mkdir preview
+          mv .!(|.) !(preview) preview/
+
+          # Get and unzip release version.
+          curl -s https://aidc-toolkit.github.io/pages.zip -o pages.zip
+          unzip -qq pages.zip
+
       - name: Checkout default repository
         uses: actions/checkout@v4
 
